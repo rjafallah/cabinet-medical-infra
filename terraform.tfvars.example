@@ -1,0 +1,2 @@
+# Copier en terraform.tfvars et renseigner son IPv4 publique (https://api.ipify.org)
+my_ip = "0.0.0.0"
