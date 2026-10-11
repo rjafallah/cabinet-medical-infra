@@ -42,4 +42,13 @@ kubectl patch storageclass local-path -p '{"metadata":{"annotations":{"storagecl
 # Helm
 curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
+# ArgoCD + application (déploiement depuis le repo gitops)
+kubectl create namespace argocd
+kubectl apply -n argocd --server-side -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+kubectl wait --for=condition=established crd/applications.argoproj.io --timeout=120s
+kubectl apply -f https://raw.githubusercontent.com/rjafallah/cabinet-medical-gitops/main/argocd/app-dev.yaml -f https://raw.githubusercontent.com/rjafallah/cabinet-medical-gitops/main/argocd/kube-prometheus-stack.yaml -f https://raw.githubusercontent.com/rjafallah/cabinet-medical-gitops/main/argocd/loki.yaml
+
+# Interfaces web accessibles via tunnel SSH (ArgoCD : 30443, Grafana : 30300)
+kubectl patch svc argocd-server -n argocd -p '{"spec":{"type":"NodePort","ports":[{"port":443,"nodePort":30443}]}}'
+
 echo "BOOTSTRAP TERMINE"
